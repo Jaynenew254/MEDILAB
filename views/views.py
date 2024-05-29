@@ -21,8 +21,8 @@
 #         # check if password is valid 
 #         response=passwordvalidity(password)
 #         if response==True:
-#             # connect to database
-#             connection =pymysql.connect(host='localhost',user='root',password='',database='medilab')
+#             # connect json database
+#             connection =pymysql.connect(host='localhost',user='root',password='',database='medilabs')
 #             cursor =connection.cursor()
 #             # insert data into database
 #             sql= "INSERT INTO members (surname, others, gender, email, phone, dob, status, password, location_id) VALUES =%s,%s,%s,%s,%s,%s,%s,%s,%s"
@@ -67,8 +67,8 @@ class MemberSignup(Resource):
         # check if password is valid
         response = passwordvalidity(password)
         if response == True:
-        # connect to DB
-            connection = pymysql.connect(host='localhost', user='root',password='',database='Medilab')
+        # connect json DB
+            connection = pymysql.connect(host='localhost', user='root',password='',database='Medilabs')
             cursor = connection.cursor()
             # instert into database
             sql = "insert into members (surname, others, gender, email, phone, dob, status, password, location_id) values(%s, %s, %s, %s, %s, %s, %s, %s,%s)"
@@ -95,8 +95,8 @@ class MemberSignin(Resource):
         email = data["email"]
         password = data["password"]
 
-        # connect to DB
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         
         # check if member exists
         sql = "SELECT * FROM members WHERE email = %s"
@@ -129,8 +129,8 @@ class MemberProfile(Resource):
     def post(self):
         data =request.json
         members_id =data ["members_id"]
-        # connect to DB
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
        
 
         # check if member exists
@@ -154,7 +154,7 @@ class AddDependant(Resource):
         others = data["others"]
         dob = data["dob"]
         # connection 
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         cursor = connection .cursor()
 
         # insert data 
@@ -175,8 +175,8 @@ class ViewDependant(Resource):
     def post(self):
         data = request.json
         members_id = data ["members_id"]
-        # connect to DB
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         cursor = connection.cursor()
         sql = "SELECT * FROM dependants WHERE member_id = %s"
         cursor.execute(sql, members_id)
@@ -190,7 +190,7 @@ class ViewDependant(Resource):
     # see all labs
 class ViewAllLabs(Resource):
     def get(self):
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         sql = "SELECT * FROM laboratories "
         cursor = connection.cursor(pymysql.cursors.DictCursor)
         cursor.execute(sql)
@@ -207,7 +207,7 @@ class LabTest(Resource):
         lab_id = data ["lab_id"]
 
         # create a connection 
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         cursor = connection.cursor(pymysql.cursors.DictCursor)
         sql = "SELECT * FROM lab_tests where lab_id =%s"
         cursor.execute(sql, lab_id)
@@ -236,47 +236,30 @@ class MakeBooking(Resource):
         longitude=["longitude"]	
         status=["status"]	
         lab_id	=["lab_id"]
+        invoice_no =["invoice_no"]
 
-         # connect to DB
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
-        cursor = connection.cursor()
+         # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
 
         
-        sql = "INSERT INTO BOOKINGS(member_id,booked_for, dependant_id,	test_id	,appointment_date,appointment_time,where_taken,latitude,longitude,status,lab_id	) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" 	
-        data=(member_id	,booked_for	,dependant_id,test_id,appointment_date,appointment_time,where_taken	,latitude,longitude	,status	,lab_id		
-)
+        sql = "INSERT INTO bookings (member_id,booked_for, dependant_id,	test_id	,appointment_date,appointment_time,where_taken,latitude,longitude,status,lab_id,invoice_no) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" 	
+        data=(member_id	,booked_for	,dependant_id,test_id,appointment_date,appointment_time,where_taken	,latitude,longitude	,status	,lab_id,invoice_no	)	
         cursor.execute(sql, data)
-        member = cursor.fetchone()
-
-        if member:
-            # member exists, check if class is available
-            cursor.execute(sql, data)
-            class_ = cursor.fetchone()
-
-        if class_:
-                # class is available, make booking
-            sql= "INSERT INTO BOOKINGS(member_id,booked_for, dependant_id,	test_id	,appointment_date,appointment_time,where_taken,latitude,longitude,status,lab_id	) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" 	
-            data=(member_id	,booked_for	,dependant_id,test_id,appointment_date,appointment_time,where_taken	,latitude,longitude	,status	,lab_id	)
-            cursor.execute(sql, data)
-            connection.commit()
-
-            #     # update class availability
-            # sql = "UPDATE classes SET available = 0 WHERE class_name = %s AND class_date = %s"
-            # data = (booked_class, booked_date)
-            # cursor.execute(sql, data)
-            # connection.commit()
-
-                # return success message
-            return jsonify ({"message": "Booking made successfully"})
         
-        #  elif
-        #         # class is not available, return error message
-        #         return jsonify({"message": "Class is not available"})
-        
+        # try:
 
-        else:
-            # member does not exist, return error message
-             return jsonify({"message": "Member not found"})
+        cursor.execute(sql,data)
+        connection.commit()
+        return jsonify({"message": "Booking Made Successfully"}) 
+    
+        # except:
+        #     connection.rollback()
+        #     return jsonify({"message": "Error Occured While Making Booking"})
+    
+
+
+        
 
         
 
@@ -287,18 +270,61 @@ class MakeBooking(Resource):
 class MyBooking(Resource):
     def get(self):
         data = request.json
-        members_id = data["members_id"]
-        # connect to DB
-        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        member_id = data["member_id"]
+        # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         cursor = connection.cursor()
-        sql = "SELECT * FROM booking  WHERE member_id = %s"
-        cursor.execute(sql, members_id)
+        sql = "SELECT * FROM bookings  WHERE member_id = %s"
+        cursor.execute(sql, member_id)
         count = cursor.rowcount
         if count == 0:
             return jsonify({"message": "member does not exist"})
         else:
-            MyBooking = cursor.fetchall()
-            return jsonify({"message": MyBooking})
+            Booking = cursor.fetchall()
+            # date and time was not convertible json
+            # hence we use json.dumps and json.loads 
+            import json
+# we pass our bookings
+            ourbookings = json.dumps(Booking,indent =1,
+                                    sort_keys = True, default=str)
+            
+            return json.loads(ourbookings)
+        
+
+# make payment
+class MakePayment(Resource):
+    def post(self):
+        data = request.json
+        invoice_no= data["invoice_no"]
+        amount=data["amount"]
+        phone= data['phone']	
+        mpesa_payment(amount,phone,invoice_no)
+        return jsonify({"message": "Payment Made Successfully"})
+
+# # connect to db
+#         connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+#         cursor = connection.cursor()
+#         sql = "INSERT INTO payments (invoice_no,total_amount) VALUES (%s,%s)"
+#         data = (invoice_no,total_amount)
+#         cursor.execute(sql, data)
+#         connection.commit()
+
+#         try:
+#             cursor.execute(sql, data)
+#             connection.commit()
+#             mpesa_payment(total_amount,phone,invoice_no)
+#             return jsonify({"message": "payment successful"})
+
+#         except:
+#             connection.rollback()
+#             return jsonify({"message": "payment failed"})
+
+
+
+    
+
+
+
 
         
 
