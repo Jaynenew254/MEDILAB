@@ -64,6 +64,42 @@ class labsignup(Resource):
         
        else:
             return jsonify({ "message":Response})
+       
+# labsignin
+
+class labsignin (Resource):
+     def post(self):
+          data = request.get_json()
+          email=data["email"]
+          password=data["password"]
+
+        #   connect to db 
+          connection = pymysql.connect(host='localhost', user='root',password='',database='Medilabs')
+          cursor = connection.cursor()
+          sql = "SELECT * FROM laboratories WHERE email = %s"
+          cursor = connection.cursor(pymysql.cursors.DictCursor)
+          cursor.execute(sql, email)
+          if cursor.rowcount == 0:    
+               return jsonify({"message": "email does not exist"})
+          else:
+            lab =cursor.fetchone()
+            hashed_password = lab['password']
+            is_matchpassword =hash_verify(password,hashed_password)
+            if is_matchpassword == True:
+                access_token = create_access_token(identity=lab,fresh=True)
+                return jsonify({"access_token":access_token,
+                                "lab":lab
+                                })
+            elif is_matchpassword == False:
+                return jsonify({"message": "Login Failed"})
+            else:
+                return jsonify({"message": "Something Went Wrong"})
+
+             
+
+
+
+
 
         
     
