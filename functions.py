@@ -136,7 +136,7 @@ def encrypt (data):
     # print (f)
     # this creates a fernet object for encryption
     encrypted_data = f.encrypt(data.encode())
-    print(encrypted_data.decode())
+    return(encrypted_data.decode())
     
 
 # encrypt("1234")
@@ -146,7 +146,7 @@ def decrypt (encrypted_data):
     key =load_key()
     f = Fernet(key)
     decrypted_data = f.decrypt(encrypted_data)
-    print(decrypted_data.decode())
+    return(decrypted_data.decode())
 
 # decrypt("gAAAAABmUEKZY7i-ntk8LwEL4npwrdgnLrBIjc6s8e98h8c0ONUlD0hZMou-9XqiSW_KZEgeT99RXgqRw-cuh9nXw4X2hg1KwA==")
 
