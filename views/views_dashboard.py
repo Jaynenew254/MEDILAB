@@ -97,6 +97,23 @@ class labsignin (Resource):
 
              
 
+# view labProfile 
+class labprofile(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        lab_id = data["lab_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        sql = "SELECT * FROM laboratories WHERE lab_id = %s"
+        cursor.execute(sql, lab_id)
+        if cursor.rowcount == 0:
+            return jsonify({"message": "Lab Profile Not Found"})
+        
+        else:
+            lab = cursor.fetchone()
+            return jsonify({"message": lab})
+
 
 
 

@@ -119,10 +119,6 @@ class MemberSignin(Resource):
             else:
                 return jsonify({"message": "Something Went Wrong"})
 
-            
-       
-               
-     # memberprofile
 
 class MemberProfile(Resource):
     @jwt_required(fresh=True)
