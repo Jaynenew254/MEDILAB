@@ -114,12 +114,48 @@ class labprofile(Resource):
             lab = cursor.fetchone()
             return jsonify({"message": lab})
 
-
-
-
-
+# create  aresource called addlabtest 
+class addlabtest(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        lab_id = data["lab_id"]
+        test_name = data["test_name"]
+        test_description=data["test_descrition"]
+        test_cost=data["test_cost"]
+        test_discount=data["test_discount"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection .cursor()
+        sql ="INSERT INTO lab_tests (lab_id, test_name, test_description,test_cost, test_discount) VALUES (%s, %s, %s, %s,%s)"
+        data =(lab_id, test_name, test_description, test_cost,test_discount)
+        try:
+            cursor.execute(sql,data)
+            connection.commit()
+            return jsonify({"message": "POST SUCCESSFUL.SAVED"})
+        except:
+            connection.rollback()
+            return jsonify({"message":"POST FAILED.NOT SAVED"})
         
-    
+# create a resource named view lab test ..method is post ..where lab_id =%S
+class Viewlabtest(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        lab_id = data ["lab_id"]
+        # connect json DB
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor()
+        sql = "SELECT * FROM lab_tests WHERE lab_id = %s"
+        cursor.execute(sql, lab_id)
+        count = cursor.rowcount
+        if count == 0:
+            return jsonify({"message": "lab does not exist"})
+        else:
+            labtests = cursor.fetchall()
+            return jsonify({"message": labtests})
+        
+
+
 
     
 
