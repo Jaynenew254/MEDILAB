@@ -154,6 +154,39 @@ class Viewlabtest(Resource):
             labtests = cursor.fetchall()
             return jsonify({"message": labtests})
         
+# view labbookings ...method post..where lab_id =%s
+class Viewlabbookings(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        lab_id = data ["lab_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor()
+        sql = "SELECT * FROM bookings WHERE lab_id = %s"
+        cursor.execute(sql, lab_id)
+        count = cursor.rowcount
+        if count == 0:
+            return jsonify({"message": "no bookings found for this lab"})
+        else:
+            Booking = cursor.fetchall()
+            # date and time was not convertible json
+            # hence we use json.dumps and json.loads 
+            import json
+# we pass our bookings
+            ourbookings = json.dumps(Booking,indent =1,
+                                    sort_keys = True, default=str)
+            
+            return json.loads(ourbookings)
+        
+        
+
+
+
+
+
+
+
+        
 
 
 
