@@ -169,6 +169,21 @@ class Viewlabbookings(Resource):
             return jsonify({"message": "no bookings found for this lab"})
         else:
             Booking = cursor.fetchall()
+            # associate member_id with the booking
+            # we want to loop 
+            for booking in Booking:
+                member_id = booking["member_id"]
+                # return jsonify(member_id)
+                sql = "SELECT * FROM members WHERE member_id = %s"
+                cursor=connection.cursor(pymysql.cursors.DictCursor)
+                cursor.execute(sql, member_id)
+                member = cursor.fetchone()
+                # the result is attached to booking dictionary under key 
+                booking["key"] = member
+                return jsonify(member)
+            
+
+
             # date and time was not convertible json
             # hence we use json.dumps and json.loads 
             import json
@@ -177,6 +192,50 @@ class Viewlabbookings(Resource):
                                     sort_keys = True, default=str)
             
             return json.loads(ourbookings)
+        
+
+# add nurse
+class Addnurse(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        surname	=data["surname"]
+        others	=data["others"]
+        lab_id =data["lab_id"]	
+        gender = data["gender"]
+        # connection 
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor()
+        sql = "INSERT INTO nurses (surname, others, lab_id, gender) VALUES (%s,%s,%s,%s)"
+        try:
+            cursor.execute(sql, (surname, others, lab_id, gender))
+            connection.commit()
+            return jsonify({"message": "nurse added successfully"})
+        except:
+            return jsonify({"message": "nurse not added"})
+        
+
+# view nurse using nurse id
+class Viewnurse(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data =request.json
+        nurse_id=data["nurse_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        sql = "SELECT * FROM nurses WHERE nurse_id = %s"
+        cursor.execute(sql, nurse_id)
+        count = cursor.rowcount
+        if count == 0:
+            return jsonify({"message": "No nurse found"})
+        else:
+            nurse = cursor.fetchall()
+            return jsonify({"message": nurse})
+                                     
+
+
+        
+
         
         
 
