@@ -16,7 +16,7 @@ jwt = JWTManager(app)
 
 # end points 
 from views . views import MemberSignup ,MemberSignin,MemberProfile,AddDependant,ViewDependant,ViewAllLabs,LabTest,MakeBooking,MyBooking,MakePayment
-from views.views_dashboard import labsignup,labsignin,labprofile,addlabtest,Viewlabtest,Viewlabbookings,Addnurse,Viewnurse
+from views.views_dashboard import labsignup,labsignin,labprofile,addlabtest,Viewlabtest,Viewlabbookings,Addnurse,Viewnurse,TaskAllocation,CheckInvoice
 api.add_resource(MemberSignup,'/api/member_signup')
 
 api.add_resource(MemberSignin,'/api/member_signin')
@@ -52,6 +52,10 @@ api.add_resource(Viewlabbookings,'/api/view_labbookings')
 api.add_resource(Addnurse,'/api/add_nurse')
 
 api.add_resource(Viewnurse,'/api/view_nurse')
+
+api.add_resource(TaskAllocation,'/api/nurse_allocation')
+
+api.add_resource(CheckInvoice,'/api/check_invoice')
 
 if __name__ == '__main__' :
     app.run(debug=True)

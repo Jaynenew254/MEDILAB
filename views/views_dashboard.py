@@ -203,12 +203,14 @@ class Addnurse(Resource):
         others	=data["others"]
         lab_id =data["lab_id"]	
         gender = data["gender"]
+        phone=data["phone"]
+        password=data["password"]
         # connection 
         connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
         cursor = connection.cursor()
-        sql = "INSERT INTO nurses (surname, others, lab_id, gender) VALUES (%s,%s,%s,%s)"
+        sql = "INSERT INTO nurses (surname, others, lab_id, gender,phone,password) VALUES (%s,%s,%s,%s,%s,%s)"
         try:
-            cursor.execute(sql, (surname, others, lab_id, gender))
+            cursor.execute(sql, (surname, others, lab_id, gender,phone,hash_password(password)))
             connection.commit()
             return jsonify({"message": "nurse added successfully"})
         except:
@@ -231,6 +233,42 @@ class Viewnurse(Resource):
         else:
             nurse = cursor.fetchall()
             return jsonify({"message": nurse})
+        
+# create a taskallocatioon resource..method post....pass nurse_id and invoice data
+class TaskAllocation(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        nurse_id=data["nurse_id"]
+        invoice_no=data["invoice_no"]
+        sql="select *from bookings where status ='pending'"
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilabs')
+        cursor =connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(sql)
+        count = cursor.rowcount
+        if count ==0:
+            return jsonify({"message": "No pending bookings found"})
+        else:
+        
+            sql1 = "INSERT INTO nurse_lab_allocations (nurse_id, invoice_no) VALUES (%s,%s)"
+            data= (nurse_id,invoice_no)
+            cursor1 =connection.cursor()
+
+        try:
+            cursor.execute(sql1,data)
+            connection.commit()
+            return jsonify({"message": "task allocated successfully"})
+        except:
+            connection.rollback()
+            return jsonify({"message": "task not allocated"})
+        
+
+        
+
+
+          
+
+
                                      
 
 
